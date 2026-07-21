@@ -1,0 +1,19 @@
+{
+  "name": "puntos-caja",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "dev": "concurrently -n API,WEB -c yellow,cyan \"npm run start:dev -w @puntos/api\" \"npm start -w @puntos/web\"",
+    "build": "npm run build -w @puntos/api && npm run build -w @puntos/web",
+    "start:api": "npm run start:prod -w @puntos/api"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
