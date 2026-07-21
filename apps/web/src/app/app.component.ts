@@ -64,7 +64,12 @@ export class AppComponent {
     }),
     dni: new FormControl('', {
       nonNullable: true,
-      validators: [Validators.required, Validators.pattern(/^\d{7,8}$/)],
+      validators: [
+        Validators.required,
+        Validators.pattern(/^\d+$/),
+        Validators.minLength(7),
+        Validators.maxLength(8),
+      ],
     }),
     email: new FormControl('', {
       nonNullable: true,
@@ -164,7 +169,6 @@ export class AppComponent {
     this.customersService
       .create({
         ...raw,
-        dni: raw.dni.replace(/\D/g, ''),
         ...(raw.email.trim() ? { email: raw.email.trim() } : {}),
       })
       .pipe(
@@ -178,8 +182,7 @@ export class AppComponent {
           this.view.set('points');
           setTimeout(() => this.pointsInput?.nativeElement.focus());
         },
-        error: (error: HttpErrorResponse) =>
-          this.message.set(this.getErrorMessage(error)),
+        error: (error: HttpErrorResponse) => this.handleCreateError(error),
       });
   }
 
@@ -241,5 +244,22 @@ export class AppComponent {
     const apiMessage = apiError.error?.message;
     if (Array.isArray(apiMessage)) return apiMessage[0] ?? 'Revisá los datos ingresados.';
     return apiMessage ?? 'No pudimos completar la operación. Intentá nuevamente.';
+  }
+
+  private handleCreateError(error: HttpErrorResponse): void {
+    const errorMessage = this.getErrorMessage(error);
+
+    if (errorMessage.toLocaleLowerCase('es').includes('dni')) {
+      const dniControl = this.createForm.controls.dni;
+      dniControl.setErrors({
+        ...dniControl.errors,
+        server: errorMessage,
+      });
+      dniControl.markAsTouched();
+      this.message.set('');
+      return;
+    }
+
+    this.message.set(errorMessage);
   }
 }

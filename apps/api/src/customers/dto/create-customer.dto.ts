@@ -25,12 +25,9 @@ export class CreateCustomerDto {
   @MaxLength(60)
   lastName: string;
 
-  @Transform(({ value }: { value: unknown }) =>
-    typeof value === 'string' ? value.replace(/\D/g, '') : value,
-  )
   @IsString()
   @Length(7, 8, { message: 'El DNI debe tener entre 7 y 8 dígitos' })
-  @Matches(/^\d+$/, { message: 'El DNI solo puede contener números' })
+  @Matches(/^\d+$/, { message: 'El DNI solo puede contener dígitos' })
   dni: string;
 
   @Transform(trim)

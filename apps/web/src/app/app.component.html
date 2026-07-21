@@ -160,8 +160,18 @@
               maxlength="8"
               placeholder="Solo números"
             />
-            @if (createForm.controls.dni.touched && createForm.controls.dni.invalid) {
-              <small class="field-error">Ingresá un DNI válido de 7 u 8 dígitos.</small>
+            @if (createForm.controls.dni.touched && createForm.controls.dni.hasError('required')) {
+              <small class="field-error">Ingresá el DNI.</small>
+            } @else if (
+              createForm.controls.dni.touched && createForm.controls.dni.hasError('pattern')
+            ) {
+              <small class="field-error">El DNI solo puede contener dígitos.</small>
+            } @else if (
+              createForm.controls.dni.touched && createForm.controls.dni.hasError('server')
+            ) {
+              <small class="field-error">{{ createForm.controls.dni.getError('server') }}</small>
+            } @else if (createForm.controls.dni.touched && createForm.controls.dni.invalid) {
+              <small class="field-error">El DNI debe tener entre 7 y 8 dígitos.</small>
             } @else {
               <small>Se usa como identificador único.</small>
             }
