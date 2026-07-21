@@ -9,7 +9,7 @@ import {
   inject,
   signal,
 } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import {
   FormControl,
   FormGroup,
@@ -80,10 +80,13 @@ export class AppComponent {
   readonly pointsForm = new FormGroup({
     points: this.pointsControl,
   });
+  private readonly enteredPoints = toSignal(this.pointsControl.valueChanges, {
+    initialValue: this.pointsControl.value,
+  });
 
   readonly pointsPreview = computed(() => {
     const customer = this.selectedCustomer();
-    const points = this.pointsControl.value;
+    const points = this.enteredPoints();
     return customer && points && this.pointsControl.valid
       ? customer.points + points
       : customer?.points ?? 0;

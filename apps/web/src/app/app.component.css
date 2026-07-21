@@ -19,7 +19,7 @@
   align-items: center;
   gap: 11px;
   color: var(--ink);
-  font-family: 'Manrope', sans-serif;
+  font-family: inherit;
   font-size: 20px;
   text-decoration: none;
 }
@@ -208,7 +208,7 @@
 .page-heading h1,
 .success-card h1 {
   margin: 0;
-  font-family: 'Manrope', sans-serif;
+  font-family: inherit;
   font-size: clamp(27px, 3vw, 38px);
   line-height: 1.18;
   letter-spacing: -0.035em;
@@ -514,7 +514,7 @@
 }
 
 .identity-copy { display: flex; align-items: center; gap: 15px; }
-.identity-copy h2 { margin: 3px 0; font-family: 'Manrope', sans-serif; font-size: 18px; }
+.identity-copy h2 { margin: 3px 0; font-family: inherit; font-size: 18px; }
 .identity-copy p { margin: 0; color: var(--muted); font-size: 11px; }
 .verified { color: #3b765d; font-size: 9px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; }
 .identity-data { display: flex; gap: 34px; padding-left: 25px; border-left: 1px solid #d2e2d9; }
@@ -533,14 +533,14 @@
 .points-input-wrap input {
   height: 68px;
   padding: 0 65px 0 18px;
-  font-family: 'Manrope', sans-serif;
+  font-family: inherit;
   font-size: 27px;
   font-weight: 700;
 }
 .points-input-wrap > span { position: absolute; top: 24px; right: 18px; color: #7d8983; font-size: 13px; font-weight: 700; }
 .calculation { display: flex; align-items: center; justify-content: space-between; margin-top: 22px; padding: 16px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
 .calculation > span { color: var(--muted); font-size: 12px; }
-.calculation > strong { color: var(--brand); font-family: 'Manrope', sans-serif; font-size: 22px; }
+.calculation > strong { color: var(--brand); font-family: inherit; font-size: 22px; }
 .calculation small { font-size: 11px; }
 .safety-note { margin: 11px 0 0; color: #7b8781; font-size: 10px; text-align: center; }
 
@@ -574,7 +574,7 @@
 }
 .new-balance strong,
 .new-balance span { display: block; }
-.new-balance strong { font-family: 'Manrope', sans-serif; font-size: 42px; letter-spacing: -0.04em; }
+.new-balance strong { font-family: inherit; font-size: 42px; letter-spacing: -0.04em; }
 .new-balance span { color: rgba(255, 255, 255, 0.72); font-size: 11px; }
 
 @media (max-width: 850px) {
