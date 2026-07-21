@@ -241,6 +241,19 @@
           } @else {
             <small>Máximo 1.000 puntos por operación.</small>
           }
+          <div class="quick-points" aria-label="Valores rápidos de puntos">
+            <span>Valores frecuentes</span>
+            @for (amount of [50, 100, 500]; track amount) {
+              <button
+                type="button"
+                [class.selected]="pointsControl.value === amount"
+                [attr.aria-pressed]="pointsControl.value === amount"
+                (click)="setQuickPoints(amount)"
+              >
+                +{{ amount }}
+              </button>
+            }
+          </div>
         </div>
 
         <div class="calculation" aria-live="polite">

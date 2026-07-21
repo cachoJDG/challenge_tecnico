@@ -208,6 +208,12 @@ export class AppComponent {
       });
   }
 
+  setQuickPoints(points: number): void {
+    this.pointsControl.setValue(points);
+    this.pointsControl.markAsDirty();
+    this.pointsInput?.nativeElement.focus();
+  }
+
   backToSearch(): void {
     this.selectedCustomer.set(null);
     this.pointsControl.reset();
