@@ -1,0 +1,286 @@
+<header class="topbar">
+  <a class="brand" href="/" aria-label="Punto Caja, inicio">
+    <span class="brand-mark" aria-hidden="true">
+      <span></span><span></span><span></span>
+    </span>
+    <span>Punto<strong>Caja</strong></span>
+  </a>
+  <div class="station">
+    <span class="status-dot"></span>
+    Caja 01
+  </div>
+</header>
+
+<main class="shell">
+  <aside class="sidebar" aria-label="Progreso de la operación">
+    <p class="eyebrow">Nueva operación</p>
+    <ol class="steps">
+      <li
+        [class.active]="view() === 'search' || view() === 'create'"
+        [class.done]="view() === 'points' || view() === 'success'"
+      >
+        <span class="step-number">
+          @if (view() === 'points' || view() === 'success') { ✓ } @else { 1 }
+        </span>
+        <div>
+          <strong>Identificar cliente</strong>
+          <small>Buscar o registrar</small>
+        </div>
+      </li>
+      <li [class.active]="view() === 'points'" [class.done]="view() === 'success'">
+        <span class="step-number">
+          @if (view() === 'success') { ✓ } @else { 2 }
+        </span>
+        <div>
+          <strong>Acreditar puntos</strong>
+          <small>Revisar y confirmar</small>
+        </div>
+      </li>
+    </ol>
+
+    <div class="sidebar-tip">
+      <span aria-hidden="true">i</span>
+      <p>Confirmá siempre el DNI con el cliente antes de acreditar.</p>
+    </div>
+  </aside>
+
+  <section class="workspace">
+    @if (view() === 'search') {
+      <div class="page-heading">
+        <p class="eyebrow">Paso 1 de 2</p>
+        <h1>¿A quién le sumamos puntos?</h1>
+        <p>Buscá por DNI, nombre, apellido o email.</p>
+      </div>
+
+      <div class="search-box">
+        <div class="search-box-heading">
+          <label for="customer-search">Buscar cliente</label>
+          <button class="new-customer-button" type="button" (click)="openCreate()">
+            <span aria-hidden="true">+</span>
+            Nuevo cliente
+          </button>
+        </div>
+        <div class="search-input-wrap">
+          <span class="search-icon" aria-hidden="true"></span>
+          <input
+            id="customer-search"
+            type="search"
+            [formControl]="searchControl"
+            placeholder="Ej: 30111222 o Juan Pérez"
+            autocomplete="off"
+            autofocus
+          />
+          @if (isSearching()) {
+            <span class="spinner" aria-label="Buscando"></span>
+          }
+        </div>
+        <small>Ingresá al menos 2 caracteres.</small>
+      </div>
+
+      @if (message()) {
+        <div class="alert error" role="alert">{{ message() }}</div>
+      }
+
+      @if (results().length > 0) {
+        <div class="results-heading">
+          <h2>{{ results().length }} {{ results().length === 1 ? 'resultado' : 'resultados' }}</h2>
+          <span>Verificá los datos antes de continuar</span>
+        </div>
+
+        <div class="results-list">
+          @for (customer of results(); track trackByCustomerId($index, customer)) {
+            <button class="customer-row" type="button" (click)="selectCustomer(customer)">
+              <span class="avatar" aria-hidden="true">
+                {{ customer.firstName.charAt(0) }}{{ customer.lastName.charAt(0) }}
+              </span>
+              <span class="customer-main">
+                <strong>{{ customer.firstName }} {{ customer.lastName }}</strong>
+                <span>{{ customer.email || 'Sin email registrado' }}</span>
+              </span>
+              <span class="customer-dni">
+                <small>DNI</small>
+                <strong>{{ formatDni(customer.dni) }}</strong>
+              </span>
+              <span class="balance">
+                <strong>{{ customer.points }}</strong>
+                <small>puntos</small>
+              </span>
+              <span class="arrow" aria-hidden="true">→</span>
+            </button>
+          }
+        </div>
+      } @else if (searchCompleted() && !isSearching()) {
+        <div class="empty-state">
+          <span class="empty-icon" aria-hidden="true">?</span>
+          <div>
+            <h2>No encontramos a este cliente</h2>
+            <p>Revisá el dato ingresado o registralo sin salir de la operación.</p>
+          </div>
+          <button class="primary compact" type="button" (click)="openCreate()">
+            + Registrar cliente
+          </button>
+        </div>
+      }
+    }
+
+    @if (view() === 'create') {
+      <button class="back-link" type="button" (click)="backToSearch()">← Volver a la búsqueda</button>
+      <div class="page-heading">
+        <p class="eyebrow">Alta rápida</p>
+        <h1>Registrar nuevo cliente</h1>
+        <p>Solo pedimos los datos necesarios. Después seguís directo con los puntos.</p>
+      </div>
+
+      @if (message()) {
+        <div class="alert error" role="alert">{{ message() }}</div>
+      }
+
+      <form class="form-card" [formGroup]="createForm" (ngSubmit)="createCustomer()" novalidate>
+        <div class="form-grid">
+          <div class="field">
+            <label for="firstName">Nombre <span>*</span></label>
+            <input id="firstName" formControlName="firstName" autocomplete="given-name" />
+            @if (createForm.controls.firstName.touched && createForm.controls.firstName.invalid) {
+              <small class="field-error">Ingresá el nombre.</small>
+            }
+          </div>
+          <div class="field">
+            <label for="lastName">Apellido <span>*</span></label>
+            <input id="lastName" formControlName="lastName" autocomplete="family-name" />
+            @if (createForm.controls.lastName.touched && createForm.controls.lastName.invalid) {
+              <small class="field-error">Ingresá el apellido.</small>
+            }
+          </div>
+          <div class="field">
+            <label for="dni">DNI <span>*</span></label>
+            <input
+              id="dni"
+              formControlName="dni"
+              inputmode="numeric"
+              maxlength="8"
+              placeholder="Solo números"
+            />
+            @if (createForm.controls.dni.touched && createForm.controls.dni.invalid) {
+              <small class="field-error">Ingresá un DNI válido de 7 u 8 dígitos.</small>
+            } @else {
+              <small>Se usa como identificador único.</small>
+            }
+          </div>
+          <div class="field">
+            <label for="email">Email <em>opcional</em></label>
+            <input id="email" formControlName="email" type="email" autocomplete="email" />
+            @if (createForm.controls.email.touched && createForm.controls.email.invalid) {
+              <small class="field-error">Ingresá un email válido.</small>
+            }
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <span><strong>*</strong> Datos obligatorios</span>
+          <button class="primary" type="submit" [disabled]="isSubmitting()">
+            {{ isSubmitting() ? 'Registrando…' : 'Registrar y continuar' }}
+            <span aria-hidden="true">→</span>
+          </button>
+        </div>
+      </form>
+    }
+
+    @if (view() === 'points' && selectedCustomer(); as customer) {
+      <button class="back-link" type="button" (click)="backToSearch()">← Elegir otra persona</button>
+      <div class="page-heading">
+        <p class="eyebrow">Paso 2 de 2</p>
+        <h1>Acreditar puntos</h1>
+        <p>Confirmá la identidad y cargá los puntos de esta compra.</p>
+      </div>
+
+      <div class="identity-card">
+        <div class="identity-copy">
+          <span class="avatar large" aria-hidden="true">
+            {{ customer.firstName.charAt(0) }}{{ customer.lastName.charAt(0) }}
+          </span>
+          <div>
+            <span class="verified">Cliente seleccionado</span>
+            <h2>{{ customer.firstName }} {{ customer.lastName }}</h2>
+            <p>{{ customer.email || 'Sin email registrado' }}</p>
+          </div>
+        </div>
+        <div class="identity-data">
+          <div><small>DNI</small><strong>{{ formatDni(customer.dni) }}</strong></div>
+          <div><small>Saldo actual</small><strong>{{ customer.points }} pts</strong></div>
+        </div>
+      </div>
+
+      @if (message()) {
+        <div class="alert error" role="alert">{{ message() }}</div>
+      }
+
+      <form
+        class="points-card"
+        [formGroup]="pointsForm"
+        (ngSubmit)="addPoints()"
+        novalidate
+      >
+        <div class="field points-field">
+          <label for="points">Puntos a acreditar</label>
+          <div class="points-input-wrap">
+            <input
+              #pointsInput
+              id="points"
+              type="number"
+              inputmode="numeric"
+              min="1"
+              max="1000"
+              step="1"
+              placeholder="0"
+              formControlName="points"
+            />
+            <span>pts</span>
+          </div>
+          @if (pointsControl.touched && pointsControl.invalid) {
+            <small class="field-error">Ingresá un número entero entre 1 y 1.000.</small>
+          } @else {
+            <small>Máximo 1.000 puntos por operación.</small>
+          }
+        </div>
+
+        <div class="calculation" aria-live="polite">
+          <span>Saldo luego de acreditar</span>
+          <strong>{{ pointsPreview() }} <small>pts</small></strong>
+        </div>
+
+        <button
+          class="primary wide"
+          type="submit"
+          [disabled]="pointsControl.invalid || isSubmitting()"
+        >
+          @if (isSubmitting()) {
+            Acreditando…
+          } @else if (pointsControl.valid && pointsControl.value) {
+            Confirmar +{{ pointsControl.value }} puntos
+          } @else {
+            Confirmar acreditación
+          }
+        </button>
+        <p class="safety-note">Esta acción actualiza el saldo inmediatamente.</p>
+      </form>
+    }
+
+    @if (view() === 'success' && selectedCustomer(); as customer) {
+      <div class="success-card" role="status">
+        <span class="success-check" aria-hidden="true">✓</span>
+        <p class="eyebrow">Operación completada</p>
+        <h1>¡Puntos acreditados!</h1>
+        <p>
+          El nuevo saldo de <strong>{{ customer.firstName }} {{ customer.lastName }}</strong> es:
+        </p>
+        <div class="new-balance">
+          <strong>{{ customer.points }}</strong>
+          <span>puntos</span>
+        </div>
+        <button class="primary" type="button" (click)="startNewOperation()">
+          Iniciar nueva operación
+        </button>
+      </div>
+    }
+  </section>
+</main>
